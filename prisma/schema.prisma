@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  EDIT
+  READY
+  LIVE
+}
+
+model User {
+  userId       String    @id @default(uuid())
+  userName     String?
+  userEmail    String    @unique
+  userPassword String?
+  authProvider String    @default("credentials")
+  userAvatar   String?
+  userRole     Role      @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  accounts     Account[]
+}
+
+model Account {
+  id                 String     @id @default(uuid())
+  userId             String
+  provider           String
+  providerAccountId  String
+  accessToken        String?
+  refreshToken       String?
+  expiresAt          Int?
+  tokenType          String?
+  savedBlogs         Blog[]
+  blogComments       BlogComments[]
+  user               User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Blog {
+  blogId       String         @id @default(uuid())
+  blogNotionId String
+  blogTitle    String
+  thumbnail    String
+  blogContent  String
+  likes        Int            @default(0)
+  blogStatus   Status         @default(READY)
+  blogAuthor   String
+  accountId    String
+  relatedTags  String[]
+  mainTag      String
+  relatedBlogs String[]       @default([])
+  comments     BlogComments[]
+  user         Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model BlogComments {
+  id            String   @id @default(uuid())
+  blogId        String
+  accountId     String
+  comment       String
+  commentLikes  String
+
+  userAccount   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  blog          Blog     @relation(fields: [blogId], references: [blogId], onDelete: Cascade)
+}
+
+model Subscribers {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  reaciveEmail Boolean
+}

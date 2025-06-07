@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const notionRouter = (0, express_1.Router)();
+const notion_controller_1 = require("../controller/notion.controller");
+notionRouter.get("/hello", notion_controller_1.notionHello);
+notionRouter.get("/all", notion_controller_1.fetchAllBlogs);
+notionRouter.get("/ready", notion_controller_1.fetchReadyBlogs);
+notionRouter.get("/title/:title", notion_controller_1.fetchBlogByTitle);
+notionRouter.get("/id/:notionBlogId", notion_controller_1.fetchPageBlockById);
+notionRouter.put("/setlive/:notionBlogId", notion_controller_1.setBlogLive);
+exports.default = notionRouter;
