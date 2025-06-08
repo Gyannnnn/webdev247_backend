@@ -14,7 +14,7 @@ export const getLiveBlogs = async (req: Request, res: Response) => {
         blogStatus: "LIVE",
       },
     });
-    console.log(liveBlogs[0].blogTitle)
+    console.log(liveBlogs[0].blogTitle);
     if (!liveBlogs || liveBlogs.length === 0) {
       res.status(404).json({
         message: "No Live Blogs found !",
@@ -88,7 +88,7 @@ export const publishBlog = async (req: Request, res: Response) => {
     //@ts-ignore
     const relatedBlogs =
       //@ts-ignore
-    props["related blog"]?.multi_select?.map((blog) => blog.name) || [];
+      props["related blog"]?.multi_select?.map((blog) => blog.name) || [];
     console.log(
       blogTitle,
       thumbnail,
@@ -130,39 +130,50 @@ export const publishBlog = async (req: Request, res: Response) => {
   }
 };
 
-
-export const getBlogsByTitle = async(req:Request,res:Response)=>{
-  const {blogTitle} = req.params
-  if(!blogTitle?.trim()){
+export const getBlogsByTitle = async (req: Request, res: Response) => {
+  const { blogTitle } = req.params;
+  if (!blogTitle?.trim()) {
     res.status(400).json({
-      message: "All Fields are required"
-    })
+      message: "All Fields are required",
+    });
   }
 
   try {
     const blog = await prisma.blog.findFirst({
-      where:{
-        blogTitle
+      where: {
+        blogTitle,
       },
-      select:{
-        comments:true
-      }
-    })
-    if(!blog){
+      select: {
+        blogId: true,
+        blogNotionId: true,
+        blogTitle: true,
+        thumbnail: true,
+        blogContent: true,
+        likes: true,
+        blogStatus: true,
+        blogAuthor: true,
+        blogDate: true,
+        relatedTags: true,
+        mainTag: true,
+        relatedBlogs: true,
+        comments: true,
+      },
+    });
+    if (!blog) {
       res.status(404).json({
-        message: "No Blogs found"
+        message: "No Blogs found",
       });
-      return
+      return;
     }
     res.status(200).json({
       message: "Blog fetched successfully",
-      blog:blog
-    })
+      blog: blog,
+    });
   } catch (error) {
-    const err = error as Error
+    const err = error as Error;
     res.status(500).json({
       message: "Internal server error",
-      error:err.message
-    })
+      error: err.message,
+    });
   }
-}
+};
