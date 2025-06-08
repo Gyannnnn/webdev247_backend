@@ -2,5 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const blogRouter = (0, express_1.Router)();
-// blogRouter.get("/live")
+const blog_controller_1 = require("../controller/blog.controller");
+blogRouter.get("/live", blog_controller_1.getLiveBlogs);
+blogRouter.post("/publish/:notionBlogId", blog_controller_1.publishBlog);
+blogRouter.get("/title/:blogTitle", blog_controller_1.getBlogsByTitle);
 exports.default = blogRouter;

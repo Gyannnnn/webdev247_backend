@@ -40,7 +40,7 @@ model Account {
   refreshToken       String?
   expiresAt          Int?
   tokenType          String?
-  savedBlogs         Blog[]
+  
   blogComments       BlogComments[]
   user               User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
@@ -52,16 +52,16 @@ model Blog {
   blogNotionId String
   blogTitle    String
   thumbnail    String
-  blogContent  String
+  blogContent  Json
   likes        Int            @default(0)
   blogStatus   Status         @default(READY)
   blogAuthor   String
-  accountId    String
+ 
   relatedTags  String[]
   mainTag      String
   relatedBlogs String[]       @default([])
   comments     BlogComments[]
-  user         Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
 }
 
 model BlogComments {
