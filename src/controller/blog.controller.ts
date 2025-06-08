@@ -88,7 +88,7 @@ export const publishBlog = async (req: Request, res: Response) => {
     //@ts-ignore
     const relatedBlogs =
       //@ts-ignore
-      props["related blog"]?.multi_select?.map((blog) => blog.name) || [];
+    props["related blog"]?.multi_select?.map((blog) => blog.name) || [];
     console.log(
       blogTitle,
       thumbnail,
@@ -143,6 +143,9 @@ export const getBlogsByTitle = async(req:Request,res:Response)=>{
     const blog = await prisma.blog.findFirst({
       where:{
         blogTitle
+      },
+      select:{
+        comments:true
       }
     })
     if(!blog){

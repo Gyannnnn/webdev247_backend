@@ -31,6 +31,17 @@ model User {
   accounts     Account[]
 }
 
+model Author{
+  id                 String     @id         @default(uuid())
+  authorName         String
+  authorBio          String
+  authorLocation     String
+  joinDate           DateTime               @default(now())
+  authorAvatar       String
+  authorLinkedin     String
+  authorX            String
+}
+
 model Account {
   id                 String     @id @default(uuid())
   userId             String
@@ -56,7 +67,7 @@ model Blog {
   likes        Int            @default(0)
   blogStatus   Status         @default(READY)
   blogAuthor   String
- 
+  blogDate     DateTime       @default(now())
   relatedTags  String[]
   mainTag      String
   relatedBlogs String[]       @default([])
@@ -70,7 +81,6 @@ model BlogComments {
   accountId     String
   comment       String
   commentLikes  String
-
   userAccount   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   blog          Blog     @relation(fields: [blogId], references: [blogId], onDelete: Cascade)
 }
