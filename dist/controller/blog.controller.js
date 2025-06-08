@@ -135,31 +135,46 @@ const getBlogsByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
     const { blogTitle } = req.params;
     if (!(blogTitle === null || blogTitle === void 0 ? void 0 : blogTitle.trim())) {
         res.status(400).json({
-            message: "All Fields are required"
+            message: "All Fields are required",
         });
     }
     try {
         const blog = yield prisma.blog.findFirst({
             where: {
-                blogTitle
-            }
+                blogTitle,
+            },
+            select: {
+                blogId: true,
+                blogNotionId: true,
+                blogTitle: true,
+                thumbnail: true,
+                blogContent: true,
+                likes: true,
+                blogStatus: true,
+                blogAuthor: true,
+                blogDate: true,
+                relatedTags: true,
+                mainTag: true,
+                relatedBlogs: true,
+                comments: true,
+            },
         });
         if (!blog) {
             res.status(404).json({
-                message: "No Blogs found"
+                message: "No Blogs found",
             });
             return;
         }
         res.status(200).json({
             message: "Blog fetched successfully",
-            blog: blog
+            blog: blog,
         });
     }
     catch (error) {
         const err = error;
         res.status(500).json({
             message: "Internal server error",
-            error: err.message
+            error: err.message,
         });
     }
 });
