@@ -166,9 +166,21 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
       });
       return;
     }
+    const blogNotionId = blog.blogNotionId
+    const dataBlocks = await notion.blocks.children.list({
+      block_id: blogNotionId,
+    });
+    if(!dataBlocks){
+      res.status(400).json({
+        message: "Failed to fetch notion content !",
+      });
+      return
+    }
+    
     res.status(200).json({
       message: "Blog fetched successfully",
       blog: blog,
+      blogContent:dataBlocks.results
     });
   } catch (error) {
     const err = error as Error;
