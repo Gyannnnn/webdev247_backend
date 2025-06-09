@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/controller/blog.controller.ts","./src/controller/notion.controller.ts","./src/routes/blogs.routes.ts","./src/routes/notion.routes.ts"],"version":"5.7.2"}
+{"root":["./src/index.ts","./src/controller/blog.controller.ts","./src/controller/notion.controller.ts","./src/controller/author/author.controller.ts","./src/routes/author.routes.ts","./src/routes/blogs.routes.ts","./src/routes/notion.routes.ts"],"version":"5.7.2"}

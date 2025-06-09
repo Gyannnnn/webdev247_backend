@@ -6,4 +6,5 @@ const blog_controller_1 = require("../controller/blog.controller");
 blogRouter.get("/live", blog_controller_1.getLiveBlogs);
 blogRouter.post("/publish/:notionBlogId", blog_controller_1.publishBlog);
 blogRouter.get("/title/:blogTitle", blog_controller_1.getBlogsByTitle);
+blogRouter.put("/update/:notionBlogId", blog_controller_1.updateBlog);
 exports.default = blogRouter;

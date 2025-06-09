@@ -7,6 +7,7 @@ import cors from 'cors'
 
 import notionRouter from "./routes/notion.routes";
 import blogRouter from "./routes/blogs.routes";
+import authorRouter from "./routes/author.routes";
 
 
 
@@ -27,7 +28,8 @@ app.get("/",(req,res)=>{
 
 
 app.use("/api/v1/notion/blogs",notionRouter);
-app.use("/api/v1/blogs",blogRouter)
+app.use("/api/v1/blogs",blogRouter);
+app.use("/api/v1/author",authorRouter);
 
 
 

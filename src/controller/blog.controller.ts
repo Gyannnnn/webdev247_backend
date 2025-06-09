@@ -2,6 +2,7 @@ import { Client, PageObjectResponse } from "@notionhq/client";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 const prisma = new PrismaClient();
+import z from "zod";
 
 export const notion = new Client({
   auth: process.env.NOTION_INTEGRATION_SECRET,
@@ -168,6 +169,70 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Blog fetched successfully",
       blog: blog,
+    });
+  } catch (error) {
+    const err = error as Error;
+    res.status(500).json({
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
+export const updateBlog = async (req: Request, res: Response) => {
+  try {
+    const schema = z.object({
+      notionBlogId: z.string().uuid(),
+    });
+    const result = schema.safeParse(req.params);
+    if (!result.success) {
+      res.status(400).json({
+        message: "Invalid input",
+        error: result.error,
+      });
+      return;
+    }
+    const { notionBlogId } = result.data;
+
+    await notion.pages.update({
+      page_id: notionBlogId,
+      properties: {
+        status: {
+          select: {
+            name: "LIVE",
+          },
+        },
+      },
+    });
+
+    const dataBlocks = await notion.blocks.children.list({
+      block_id: notionBlogId,
+    });
+
+    if(!dataBlocks){
+      res.status(400).json({
+        message: "Failed to fetch notion content !",
+      });
+      return
+    }
+
+    const blog = await prisma.blog.update({
+      where: {
+        blogNotionId: notionBlogId,
+      },
+      data: {
+        blogContent: dataBlocks.results,
+      },
+    });
+    if (!blog) {
+      res.status(400).json({
+        message: "Failed to update blog",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      message: `${blog.blogTitle}  updated successfully`,
     });
   } catch (error) {
     const err = error as Error;

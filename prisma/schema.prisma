@@ -60,7 +60,7 @@ model Account {
 
 model Blog {
   blogId       String         @id @default(uuid())
-  blogNotionId String
+  blogNotionId String             @unique
   blogTitle    String
   thumbnail    String
   blogContent  Json
