@@ -84,9 +84,9 @@ export const publishBlog = async (req: Request, res: Response) => {
     const relatedTags =
       //@ts-ignore
       props.related_tags?.multi_select?.map((tag) => tag.name) || [];
-
+    const description = props.description.rich_text?.name || "";
     // 5. mainTag (select)
-    const mainTag = props.main_tag?.select?.name || null;
+    const catagory = props.catagory?.select?.name || null;
     const blogAuthor = props.Author.people[0].name;
     // 6. relatedBlogs (multi_select)
     //@ts-ignore
@@ -98,7 +98,7 @@ export const publishBlog = async (req: Request, res: Response) => {
       thumbnail,
       blogStatus,
       relatedTags,
-      mainTag,
+      description,
       relatedBlogs
     );
 
@@ -108,12 +108,12 @@ export const publishBlog = async (req: Request, res: Response) => {
         blogNotionId: notionBlogId as string,
         blogTitle: blogTitle,
         thumbnail,
-
         blogStatus,
         blogAuthor,
         relatedBlogs,
         relatedTags,
-        mainTag,
+        blogCatagory: catagory,
+        blogDescription: description,
       },
     });
     console.log(newBlog);
@@ -157,7 +157,7 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
         blogAuthor: true,
         blogDate: true,
         relatedTags: true,
-        mainTag: true,
+
         relatedBlogs: true,
         comments: true,
       },

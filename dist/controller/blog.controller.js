@@ -47,7 +47,7 @@ const getLiveBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getLiveBlogs = getLiveBlogs;
 const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
     const { notionBlogId } = req.params;
     if (!(notionBlogId === null || notionBlogId === void 0 ? void 0 : notionBlogId.trim())) {
         res.status(400).json({
@@ -91,15 +91,16 @@ const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const relatedTags = 
         //@ts-ignore
         ((_l = (_k = props.related_tags) === null || _k === void 0 ? void 0 : _k.multi_select) === null || _l === void 0 ? void 0 : _l.map((tag) => tag.name)) || [];
+        const description = ((_m = props.description.rich_text) === null || _m === void 0 ? void 0 : _m.name) || "";
         // 5. mainTag (select)
-        const mainTag = ((_o = (_m = props.main_tag) === null || _m === void 0 ? void 0 : _m.select) === null || _o === void 0 ? void 0 : _o.name) || null;
+        const catagory = ((_p = (_o = props.catagory) === null || _o === void 0 ? void 0 : _o.select) === null || _p === void 0 ? void 0 : _p.name) || null;
         const blogAuthor = props.Author.people[0].name;
         // 6. relatedBlogs (multi_select)
         //@ts-ignore
         const relatedBlogs = 
         //@ts-ignore
-        ((_q = (_p = props["related blog"]) === null || _p === void 0 ? void 0 : _p.multi_select) === null || _q === void 0 ? void 0 : _q.map((blog) => blog.name)) || [];
-        console.log(blogTitle, thumbnail, blogStatus, relatedTags, mainTag, relatedBlogs);
+        ((_r = (_q = props["related blog"]) === null || _q === void 0 ? void 0 : _q.multi_select) === null || _r === void 0 ? void 0 : _r.map((blog) => blog.name)) || [];
+        console.log(blogTitle, thumbnail, blogStatus, relatedTags, description, relatedBlogs);
         console.log("======================================");
         const newBlog = yield prisma.blog.create({
             data: {
@@ -110,7 +111,8 @@ const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 blogAuthor,
                 relatedBlogs,
                 relatedTags,
-                mainTag,
+                blogCatagory: catagory,
+                blogDescription: description,
             },
         });
         console.log(newBlog);
@@ -154,7 +156,6 @@ const getBlogsByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
                 blogAuthor: true,
                 blogDate: true,
                 relatedTags: true,
-                mainTag: true,
                 relatedBlogs: true,
                 comments: true,
             },

@@ -31,56 +31,57 @@ model User {
   accounts     Account[]
 }
 
-model Author{
-  id                 String     @id         @default(uuid())
-  authorName         String
-  authorBio          String
-  authorLocation     String
-  joinDate           DateTime               @default(now())
-  authorAvatar       String
-  authorLinkedin     String
-  authorX            String
+model Author {
+  id             String   @id @default(uuid())
+  authorName     String
+  authorBio      String
+  authorLocation String
+  joinDate       DateTime @default(now())
+  authorAvatar   String
+  authorLinkedin String
+  authorX        String
 }
 
 model Account {
-  id                 String     @id @default(uuid())
-  userId             String
-  provider           String
-  providerAccountId  String
-  accessToken        String?
-  refreshToken       String?
-  expiresAt          Int?
-  tokenType          String?
-  
-  blogComments       BlogComments[]
-  user               User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  id                String  @id @default(uuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         Int?
+  tokenType         String?
+
+  blogComments BlogComments[]
+  user         User           @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Blog {
-  blogId       String         @id @default(uuid())
-  blogNotionId String             @unique
-  blogTitle    String
-  thumbnail    String  
-  likes        Int            @default(0)
-  blogStatus   Status         @default(READY)
-  blogAuthor   String
-  blogDate     DateTime       @default(now())
-  relatedTags  String[]
-  mainTag      String
+  blogId          String   @id @default(uuid())
+  blogNotionId    String   @unique
+  blogTitle       String
+  blogCatagory    String
+  blogDescription String
+  thumbnail       String
+  likes           Int      @default(0)
+  blogStatus      Status   @default(READY)
+  blogAuthor      String
+  blogDate        DateTime @default(now())
+  relatedTags     String[]
+
   relatedBlogs String[]       @default([])
   comments     BlogComments[]
-  
 }
 
 model BlogComments {
-  id            String   @id @default(uuid())
-  blogId        String
-  accountId     String
-  comment       String  
-  userAccount   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  blog          Blog     @relation(fields: [blogId], references: [blogId], onDelete: Cascade)
+  id          String  @id @default(uuid())
+  blogId      String
+  accountId   String
+  comment     String
+  userAccount Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  blog        Blog    @relation(fields: [blogId], references: [blogId], onDelete: Cascade)
 }
 
 model Subscribers {
