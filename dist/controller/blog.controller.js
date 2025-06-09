@@ -22,6 +22,9 @@ const getLiveBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             where: {
                 blogStatus: "LIVE",
             },
+            orderBy: {
+                blogDate: "desc",
+            },
         });
         if (!liveBlogs || liveBlogs.length === 0) {
             res.status(404).json({

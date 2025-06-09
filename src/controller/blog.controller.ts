@@ -14,8 +14,11 @@ export const getLiveBlogs = async (req: Request, res: Response) => {
       where: {
         blogStatus: "LIVE",
       },
+      orderBy: {
+        blogDate: "desc",
+      },
     });
-    
+
     if (!liveBlogs || liveBlogs.length === 0) {
       res.status(404).json({
         message: "No Live Blogs found !",
@@ -105,7 +108,7 @@ export const publishBlog = async (req: Request, res: Response) => {
         blogNotionId: notionBlogId as string,
         blogTitle: blogTitle,
         thumbnail,
-        
+
         blogStatus,
         blogAuthor,
         relatedBlogs,
@@ -148,7 +151,7 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
         blogId: true,
         blogNotionId: true,
         blogTitle: true,
-        thumbnail: true,        
+        thumbnail: true,
         likes: true,
         blogStatus: true,
         blogAuthor: true,
@@ -158,12 +161,11 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
         relatedBlogs: true,
         comments: true,
       },
-    });    
-    
+    });
+
     res.status(200).json({
       message: "Blog fetched successfully",
       blog: blog,
-      
     });
   } catch (error) {
     const err = error as Error;
