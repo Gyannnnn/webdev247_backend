@@ -62,8 +62,7 @@ model Blog {
   blogId       String         @id @default(uuid())
   blogNotionId String             @unique
   blogTitle    String
-  thumbnail    String
-  blogContent  Json
+  thumbnail    String  
   likes        Int            @default(0)
   blogStatus   Status         @default(READY)
   blogAuthor   String
@@ -79,8 +78,7 @@ model BlogComments {
   id            String   @id @default(uuid())
   blogId        String
   accountId     String
-  comment       String
-  commentLikes  String
+  comment       String  
   userAccount   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   blog          Blog     @relation(fields: [blogId], references: [blogId], onDelete: Cascade)
 }

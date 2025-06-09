@@ -8,15 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBlog = exports.getBlogsByTitle = exports.publishBlog = exports.getLiveBlogs = exports.notion = void 0;
+exports.getBlogsByTitle = exports.publishBlog = exports.getLiveBlogs = exports.notion = void 0;
 const client_1 = require("@notionhq/client");
 const client_2 = require("@prisma/client");
 const prisma = new client_2.PrismaClient();
-const zod_1 = __importDefault(require("zod"));
 exports.notion = new client_1.Client({
     auth: process.env.NOTION_INTEGRATION_SECRET,
 });
@@ -27,7 +23,6 @@ const getLiveBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 blogStatus: "LIVE",
             },
         });
-        console.log(liveBlogs[0].blogTitle);
         if (!liveBlogs || liveBlogs.length === 0) {
             res.status(404).json({
                 message: "No Live Blogs found !",
@@ -108,7 +103,6 @@ const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 blogNotionId: notionBlogId,
                 blogTitle: blogTitle,
                 thumbnail,
-                blogContent: dataBlocks.results,
                 blogStatus,
                 blogAuthor,
                 relatedBlogs,
@@ -176,63 +170,58 @@ const getBlogsByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getBlogsByTitle = getBlogsByTitle;
-const updateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const schema = zod_1.default.object({
-            notionBlogId: zod_1.default.string().uuid(),
-        });
-        const result = schema.safeParse(req.params);
-        if (!result.success) {
-            res.status(400).json({
-                message: "Invalid input",
-                error: result.error,
-            });
-            return;
-        }
-        const { notionBlogId } = result.data;
-        yield exports.notion.pages.update({
-            page_id: notionBlogId,
-            properties: {
-                status: {
-                    select: {
-                        name: "LIVE",
-                    },
-                },
-            },
-        });
-        const dataBlocks = yield exports.notion.blocks.children.list({
-            block_id: notionBlogId,
-        });
-        if (!dataBlocks) {
-            res.status(400).json({
-                message: "Failed to fetch notion content !",
-            });
-            return;
-        }
-        const blog = yield prisma.blog.update({
-            where: {
-                blogNotionId: notionBlogId,
-            },
-            data: {
-                blogContent: dataBlocks.results,
-            },
-        });
-        if (!blog) {
-            res.status(400).json({
-                message: "Failed to update blog",
-            });
-            return;
-        }
-        res.status(200).json({
-            message: `${blog.blogTitle}  updated successfully`,
-        });
-    }
-    catch (error) {
-        const err = error;
-        res.status(500).json({
-            message: "Internal server error",
-            error: err.message,
-        });
-    }
-});
-exports.updateBlog = updateBlog;
+// export const updateBlog = async (req: Request, res: Response) => {
+//   try {
+//     const schema = z.object({
+//       notionBlogId: z.string().uuid(),
+//     });
+//     const result = schema.safeParse(req.params);
+//     if (!result.success) {
+//       res.status(400).json({
+//         message: "Invalid input",
+//         error: result.error,
+//       });
+//       return;
+//     }
+//     const { notionBlogId } = result.data;
+//     await notion.pages.update({
+//       page_id: notionBlogId,
+//       properties: {
+//         status: {
+//           select: {
+//             name: "LIVE",
+//           },
+//         },
+//       },
+//     });
+//     const dataBlocks = await notion.blocks.children.list({
+//       block_id: notionBlogId,
+//     });
+//     if(!dataBlocks){
+//       res.status(400).json({
+//         message: "Failed to fetch notion content !",
+//       });
+//       return
+//     }
+//     const blog = await prisma.blog.update({
+//       where: {
+//         blogNotionId: notionBlogId,
+//       }
+//     });
+//     if (!blog) {
+//       res.status(400).json({
+//         message: "Failed to update blog",
+//       });
+//       return;
+//     }
+//     res.status(200).json({
+//       message: `${blog.blogTitle}  updated successfully`,
+//     });
+//   } catch (error) {
+//     const err = error as Error;
+//     res.status(500).json({
+//       message: "Internal server error",
+//       error: err.message,
+//     });
+//   }
+// };

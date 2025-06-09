@@ -15,7 +15,7 @@ export const getLiveBlogs = async (req: Request, res: Response) => {
         blogStatus: "LIVE",
       },
     });
-    console.log(liveBlogs[0].blogTitle);
+    
     if (!liveBlogs || liveBlogs.length === 0) {
       res.status(404).json({
         message: "No Live Blogs found !",
@@ -105,7 +105,7 @@ export const publishBlog = async (req: Request, res: Response) => {
         blogNotionId: notionBlogId as string,
         blogTitle: blogTitle,
         thumbnail,
-        blogContent: dataBlocks.results,
+        
         blogStatus,
         blogAuthor,
         relatedBlogs,
@@ -174,66 +174,63 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
   }
 };
 
-export const updateBlog = async (req: Request, res: Response) => {
-  try {
-    const schema = z.object({
-      notionBlogId: z.string().uuid(),
-    });
-    const result = schema.safeParse(req.params);
-    if (!result.success) {
-      res.status(400).json({
-        message: "Invalid input",
-        error: result.error,
-      });
-      return;
-    }
-    const { notionBlogId } = result.data;
+// export const updateBlog = async (req: Request, res: Response) => {
+//   try {
+//     const schema = z.object({
+//       notionBlogId: z.string().uuid(),
+//     });
+//     const result = schema.safeParse(req.params);
+//     if (!result.success) {
+//       res.status(400).json({
+//         message: "Invalid input",
+//         error: result.error,
+//       });
+//       return;
+//     }
+//     const { notionBlogId } = result.data;
 
-    await notion.pages.update({
-      page_id: notionBlogId,
-      properties: {
-        status: {
-          select: {
-            name: "LIVE",
-          },
-        },
-      },
-    });
+//     await notion.pages.update({
+//       page_id: notionBlogId,
+//       properties: {
+//         status: {
+//           select: {
+//             name: "LIVE",
+//           },
+//         },
+//       },
+//     });
 
-    const dataBlocks = await notion.blocks.children.list({
-      block_id: notionBlogId,
-    });
+//     const dataBlocks = await notion.blocks.children.list({
+//       block_id: notionBlogId,
+//     });
 
-    if(!dataBlocks){
-      res.status(400).json({
-        message: "Failed to fetch notion content !",
-      });
-      return
-    }
+//     if(!dataBlocks){
+//       res.status(400).json({
+//         message: "Failed to fetch notion content !",
+//       });
+//       return
+//     }
 
-    const blog = await prisma.blog.update({
-      where: {
-        blogNotionId: notionBlogId,
-      },
-      data: {
-        blogContent: dataBlocks.results,
-      },
-    });
-    if (!blog) {
-      res.status(400).json({
-        message: "Failed to update blog",
-      });
-      return;
-    }
+//     const blog = await prisma.blog.update({
+//       where: {
+//         blogNotionId: notionBlogId,
+//       }
+//     });
+//     if (!blog) {
+//       res.status(400).json({
+//         message: "Failed to update blog",
+//       });
+//       return;
+//     }
 
-    res.status(200).json({
-      message: `${blog.blogTitle}  updated successfully`,
-    });
-  } catch (error) {
-    const err = error as Error;
-    res.status(500).json({
-      message: "Internal server error",
-      error: err.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       message: `${blog.blogTitle}  updated successfully`,
+//     });
+//   } catch (error) {
+//     const err = error as Error;
+//     res.status(500).json({
+//       message: "Internal server error",
+//       error: err.message,
+//     });
+//   }
+// };
