@@ -148,8 +148,7 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
         blogId: true,
         blogNotionId: true,
         blogTitle: true,
-        thumbnail: true,
-        blogContent: true,
+        thumbnail: true,        
         likes: true,
         blogStatus: true,
         blogAuthor: true,
@@ -159,28 +158,12 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
         relatedBlogs: true,
         comments: true,
       },
-    });
-    if (!blog) {
-      res.status(404).json({
-        message: "No Blogs found",
-      });
-      return;
-    }
-    const blogNotionId = blog.blogNotionId
-    const dataBlocks = await notion.blocks.children.list({
-      block_id: blogNotionId,
-    });
-    if(!dataBlocks){
-      res.status(400).json({
-        message: "Failed to fetch notion content !",
-      });
-      return
-    }
+    });    
     
     res.status(200).json({
       message: "Blog fetched successfully",
       blog: blog,
-      blogContent:dataBlocks.results
+      
     });
   } catch (error) {
     const err = error as Error;

@@ -152,7 +152,6 @@ const getBlogsByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
                 blogNotionId: true,
                 blogTitle: true,
                 thumbnail: true,
-                blogContent: true,
                 likes: true,
                 blogStatus: true,
                 blogAuthor: true,
@@ -163,26 +162,9 @@ const getBlogsByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
                 comments: true,
             },
         });
-        if (!blog) {
-            res.status(404).json({
-                message: "No Blogs found",
-            });
-            return;
-        }
-        const blogNotionId = blog.blogNotionId;
-        const dataBlocks = yield exports.notion.blocks.children.list({
-            block_id: blogNotionId,
-        });
-        if (!dataBlocks) {
-            res.status(400).json({
-                message: "Failed to fetch notion content !",
-            });
-            return;
-        }
         res.status(200).json({
             message: "Blog fetched successfully",
             blog: blog,
-            blogContent: dataBlocks.results
         });
     }
     catch (error) {
