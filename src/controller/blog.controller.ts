@@ -101,12 +101,17 @@ export const publishBlog = async (req: Request, res: Response) => {
       catagory,
       "-----------------------------------------"
     );
-
-    
+    const authorData = await prisma.author.findFirst({
+      where: {
+        authorName: blogAuthor,
+      },
+    });
+    const authorid = authorData?.id;
+    console.log(`author id ${authorid}`);
     const newBlog = await prisma.blog.create({
       data: {
-        blogNotionId: notionBlogId as string,
-        blogTitle: blogTitle,
+        blogNotionId: notionBlogId,
+        blogTitle,
         thumbnail,
         blogStatus,
         blogAuthor,
@@ -114,6 +119,11 @@ export const publishBlog = async (req: Request, res: Response) => {
         relatedTags,
         blogCatagory: catagory,
         blogDescription: description,
+        author: {
+          connect: {
+            id: authorid,
+          },
+        },
       },
     });
     console.log(newBlog);
@@ -146,7 +156,7 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
     const blog = await prisma.blog.findFirst({
       where: {
         blogTitle,
-      }
+      },
     });
 
     res.status(200).json({

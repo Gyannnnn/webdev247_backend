@@ -97,10 +97,17 @@ const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         //@ts-ignore
         ((_u = (_t = props["related blog"]) === null || _t === void 0 ? void 0 : _t.multi_select) === null || _u === void 0 ? void 0 : _u.map((blog) => blog.name)) || [];
         console.log(blogTitle, thumbnail, blogStatus, relatedTags, description, relatedBlogs, "------------------------------", catagory, "-----------------------------------------");
+        const authorData = yield prisma.author.findFirst({
+            where: {
+                authorName: blogAuthor,
+            },
+        });
+        const authorid = authorData === null || authorData === void 0 ? void 0 : authorData.id;
+        console.log(`author id ${authorid}`);
         const newBlog = yield prisma.blog.create({
             data: {
                 blogNotionId: notionBlogId,
-                blogTitle: blogTitle,
+                blogTitle,
                 thumbnail,
                 blogStatus,
                 blogAuthor,
@@ -108,6 +115,11 @@ const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 relatedTags,
                 blogCatagory: catagory,
                 blogDescription: description,
+                author: {
+                    connect: {
+                        id: authorid,
+                    },
+                },
             },
         });
         console.log(newBlog);
@@ -140,7 +152,7 @@ const getBlogsByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
         const blog = yield prisma.blog.findFirst({
             where: {
                 blogTitle,
-            }
+            },
         });
         res.status(200).json({
             message: "Blog fetched successfully",

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 const prisma = new PrismaClient();
 import z from "zod";
 
-export const createAuthor = async(req: Request, res: Response) => {
+export const createAuthor = async (req: Request, res: Response) => {
   try {
     const schema = z.object({
       authorName: z.string().min(4, "Name is required"),
@@ -30,10 +30,10 @@ export const createAuthor = async(req: Request, res: Response) => {
       authorLinkedin,
       authorX,
     } = result.data;
-
+    const name = authorName.toLowerCase();
     const newAuthor = await prisma.author.create({
       data: {
-        authorName,
+        authorName: name,
         authorBio,
         authorLocation,
         authorAvatar,
@@ -41,55 +41,65 @@ export const createAuthor = async(req: Request, res: Response) => {
         authorX,
       },
     });
-    if(!newAuthor){
-        res.status(400).json({
-            message: "Failed to create new Author"
-        });
-        return
+    if (!newAuthor) {
+      res.status(400).json({
+        message: "Failed to create new Author",
+      });
+      return;
     }
     res.status(200).json({
-        message: `${newAuthor.authorName} is now Author`
-    })
+      message: `${newAuthor.authorName} is now Author`,
+    });
   } catch (error) {
-    const err = error as Error
+    const err = error as Error;
     res.status(500).json({
-        message:"Internal server error",
-        error:err.message
-    })
+      message: "Internal server error",
+      error: err.message,
+    });
   }
 };
 
-
-export const getAuthorByName = async(req:Request,res:Response)=>{
-  const {name} = req.params
-  if(!name?.trim()){
+export const getAuthorByName = async (req: Request, res: Response) => {
+  const { name } = req.params;
+  if (!name?.trim()) {
     res.status(400).json({
-      message: "All fields are required"
-    })
+      message: "All fields are required",
+    });
   }
- console.log(name)
+  console.log(name);
   try {
     const author = await prisma.author.findFirst({
-      where:{
-        authorName:name
-      }
-    })
-    console.log(author)
-    if(!author){
+      where: {
+        authorName: name,
+      },
+      select: {
+        id: true,
+        authorName: true,
+        authorBio: true,
+        authorLocation: true,
+        joinDate: true,
+        authorAvatar: true,
+        authorLinkedin: true,
+        authorX: true,
+        blogs: true,
+      },
+    });
+
+    if (!author) {
       res.status(404).json({
-        message: "No Author found"
+        message: "No Author found",
       });
-      return
+      return;
     }
     res.status(200).json({
       message: "Author found successfully",
-      author:author
-    })
+      author: author,
+    });
   } catch (error) {
-    const err = error as Error
+    const err = error as Error;
     res.status(500).json({
       message: "Internal server error",
-      error:err.message
-    })
+      error: err.message,
+    });
   }
-}
+};

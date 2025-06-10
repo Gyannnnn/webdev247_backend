@@ -40,6 +40,7 @@ model Author {
   authorAvatar   String
   authorLinkedin String
   authorX        String
+  blogs          Blog[]
 }
 
 model Account {
@@ -70,9 +71,11 @@ model Blog {
   blogAuthor      String
   blogDate        DateTime @default(now())
   relatedTags     String[]
+  authorId        String
 
   relatedBlogs String[]       @default([])
   comments     BlogComments[]
+  author       Author        @relation(fields: [authorId],references: [id])
 }
 
 model BlogComments {

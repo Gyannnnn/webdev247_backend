@@ -35,9 +35,10 @@ const createAuthor = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return;
         }
         const { authorName, authorBio, authorLocation, authorAvatar, authorLinkedin, authorX, } = result.data;
+        const name = authorName.toLowerCase();
         const newAuthor = yield prisma.author.create({
             data: {
-                authorName,
+                authorName: name,
                 authorBio,
                 authorLocation,
                 authorAvatar,
@@ -47,19 +48,19 @@ const createAuthor = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         if (!newAuthor) {
             res.status(400).json({
-                message: "Failed to create new Author"
+                message: "Failed to create new Author",
             });
             return;
         }
         res.status(200).json({
-            message: `${newAuthor.authorName} is now Author`
+            message: `${newAuthor.authorName} is now Author`,
         });
     }
     catch (error) {
         const err = error;
         res.status(500).json({
             message: "Internal server error",
-            error: err.message
+            error: err.message,
         });
     }
 });
@@ -68,33 +69,43 @@ const getAuthorByName = (req, res) => __awaiter(void 0, void 0, void 0, function
     const { name } = req.params;
     if (!(name === null || name === void 0 ? void 0 : name.trim())) {
         res.status(400).json({
-            message: "All fields are required"
+            message: "All fields are required",
         });
     }
     console.log(name);
     try {
         const author = yield prisma.author.findFirst({
             where: {
-                authorName: name
-            }
+                authorName: name,
+            },
+            select: {
+                id: true,
+                authorName: true,
+                authorBio: true,
+                authorLocation: true,
+                joinDate: true,
+                authorAvatar: true,
+                authorLinkedin: true,
+                authorX: true,
+                blogs: true,
+            },
         });
-        console.log(author);
         if (!author) {
             res.status(404).json({
-                message: "No Author found"
+                message: "No Author found",
             });
             return;
         }
         res.status(200).json({
             message: "Author found successfully",
-            author: author
+            author: author,
         });
     }
     catch (error) {
         const err = error;
         res.status(500).json({
             message: "Internal server error",
-            error: err.message
+            error: err.message,
         });
     }
 });
