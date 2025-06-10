@@ -57,11 +57,8 @@ export const publishBlog = async (req: Request, res: Response) => {
       },
     });
     console.log(1);
-    const dataBlocks = await notion.blocks.children.list({
-      block_id: notionBlogId,
-    });
     const page = await notion.pages.retrieve({ page_id: notionBlogId });
-    console.log(page);
+
     //@ts-ignore
     const props = page.properties;
     console.log("xxxxxxxxxxxxxxxxxx");
@@ -84,7 +81,7 @@ export const publishBlog = async (req: Request, res: Response) => {
     const relatedTags =
       //@ts-ignore
       props.related_tags?.multi_select?.map((tag) => tag.name) || [];
-    const description = props.description.rich_text?.name || "";
+    const description = props.description?.rich_text?.[0]?.text?.content || "";
     // 5. mainTag (select)
     const catagory = props.catagory?.select?.name || null;
     const blogAuthor = props.Author.people[0].name;
@@ -99,10 +96,13 @@ export const publishBlog = async (req: Request, res: Response) => {
       blogStatus,
       relatedTags,
       description,
-      relatedBlogs
+      relatedBlogs,
+      "------------------------------",
+      catagory,
+      "-----------------------------------------"
     );
 
-    console.log("======================================");
+    
     const newBlog = await prisma.blog.create({
       data: {
         blogNotionId: notionBlogId as string,
@@ -146,21 +146,7 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
     const blog = await prisma.blog.findFirst({
       where: {
         blogTitle,
-      },
-      select: {
-        blogId: true,
-        blogNotionId: true,
-        blogTitle: true,
-        thumbnail: true,
-        likes: true,
-        blogStatus: true,
-        blogAuthor: true,
-        blogDate: true,
-        relatedTags: true,
-
-        relatedBlogs: true,
-        comments: true,
-      },
+      }
     });
 
     res.status(200).json({

@@ -47,7 +47,7 @@ const getLiveBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getLiveBlogs = getLiveBlogs;
 const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
     const { notionBlogId } = req.params;
     if (!(notionBlogId === null || notionBlogId === void 0 ? void 0 : notionBlogId.trim())) {
         res.status(400).json({
@@ -66,11 +66,7 @@ const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             },
         });
         console.log(1);
-        const dataBlocks = yield exports.notion.blocks.children.list({
-            block_id: notionBlogId,
-        });
         const page = yield exports.notion.pages.retrieve({ page_id: notionBlogId });
-        console.log(page);
         //@ts-ignore
         const props = page.properties;
         console.log("xxxxxxxxxxxxxxxxxx");
@@ -91,17 +87,16 @@ const publishBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const relatedTags = 
         //@ts-ignore
         ((_l = (_k = props.related_tags) === null || _k === void 0 ? void 0 : _k.multi_select) === null || _l === void 0 ? void 0 : _l.map((tag) => tag.name)) || [];
-        const description = ((_m = props.description.rich_text) === null || _m === void 0 ? void 0 : _m.name) || "";
+        const description = ((_q = (_p = (_o = (_m = props.description) === null || _m === void 0 ? void 0 : _m.rich_text) === null || _o === void 0 ? void 0 : _o[0]) === null || _p === void 0 ? void 0 : _p.text) === null || _q === void 0 ? void 0 : _q.content) || "";
         // 5. mainTag (select)
-        const catagory = ((_p = (_o = props.catagory) === null || _o === void 0 ? void 0 : _o.select) === null || _p === void 0 ? void 0 : _p.name) || null;
+        const catagory = ((_s = (_r = props.catagory) === null || _r === void 0 ? void 0 : _r.select) === null || _s === void 0 ? void 0 : _s.name) || null;
         const blogAuthor = props.Author.people[0].name;
         // 6. relatedBlogs (multi_select)
         //@ts-ignore
         const relatedBlogs = 
         //@ts-ignore
-        ((_r = (_q = props["related blog"]) === null || _q === void 0 ? void 0 : _q.multi_select) === null || _r === void 0 ? void 0 : _r.map((blog) => blog.name)) || [];
-        console.log(blogTitle, thumbnail, blogStatus, relatedTags, description, relatedBlogs);
-        console.log("======================================");
+        ((_u = (_t = props["related blog"]) === null || _t === void 0 ? void 0 : _t.multi_select) === null || _u === void 0 ? void 0 : _u.map((blog) => blog.name)) || [];
+        console.log(blogTitle, thumbnail, blogStatus, relatedTags, description, relatedBlogs, "------------------------------", catagory, "-----------------------------------------");
         const newBlog = yield prisma.blog.create({
             data: {
                 blogNotionId: notionBlogId,
@@ -145,20 +140,7 @@ const getBlogsByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
         const blog = yield prisma.blog.findFirst({
             where: {
                 blogTitle,
-            },
-            select: {
-                blogId: true,
-                blogNotionId: true,
-                blogTitle: true,
-                thumbnail: true,
-                likes: true,
-                blogStatus: true,
-                blogAuthor: true,
-                blogDate: true,
-                relatedTags: true,
-                relatedBlogs: true,
-                comments: true,
-            },
+            }
         });
         res.status(200).json({
             message: "Blog fetched successfully",
