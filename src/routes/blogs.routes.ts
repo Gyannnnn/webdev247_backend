@@ -2,7 +2,7 @@ import { Router } from "express";
 const blogRouter = Router();
 
 
-import { getBlogsByTitle, getLiveBlogs, publishBlog,  } from "../controller/blog.controller";
+import { getBlogsByTitle, getLiveBlogs, publishBlog,  } from "../controller/blog/blog.controller";
 
 
 blogRouter.get("/live",getLiveBlogs)

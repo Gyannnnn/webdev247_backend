@@ -2,7 +2,6 @@ import { Client, PageObjectResponse } from "@notionhq/client";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 const prisma = new PrismaClient();
-import z from "zod";
 
 export const notion = new Client({
   auth: process.env.NOTION_INTEGRATION_SECRET,
@@ -13,6 +12,21 @@ export const getLiveBlogs = async (req: Request, res: Response) => {
     const liveBlogs = await prisma.blog.findMany({
       where: {
         blogStatus: "LIVE",
+      },
+      select: {
+        blogId: true,
+        blogNotionId: true,
+        blogTitle: true,
+        blogCatagory: true,
+        blogDescription: true,
+        thumbnail: true,
+        likes: true,
+        blogStatus: true,
+        blogAuthor: true,
+        blogDate: true,
+        relatedTags: true,
+        authorId: true,
+        author: true,
       },
       orderBy: {
         blogDate: "desc",
@@ -97,9 +111,7 @@ export const publishBlog = async (req: Request, res: Response) => {
       relatedTags,
       description,
       relatedBlogs,
-      "------------------------------",
-      catagory,
-      "-----------------------------------------"
+      catagory
     );
     const authorData = await prisma.author.findFirst({
       where: {
@@ -212,6 +224,9 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
 //     const blog = await prisma.blog.update({
 //       where: {
 //         blogNotionId: notionBlogId,
+//       },
+//       data:{
+
 //       }
 //     });
 //     if (!blog) {
@@ -232,3 +247,36 @@ export const getBlogsByTitle = async (req: Request, res: Response) => {
 //     });
 //   }
 // };
+
+export const getBlogsByCategory = async (req: Request, res: Response) => {
+  const { category } = req.params;
+  if (!category?.trim()) {
+    res.status(400).json({
+      message: "All fields are required",
+    });
+  }
+
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: {
+        blogCatagory: category,
+      },
+    });
+    if (!blogs || blogs.length === 0) {
+      res.status(404).json({
+        message: "No blogs found",
+      });
+      return;
+    }
+    res.status(200).json({
+      message: "Blogs fetched successfully",
+      blogs: blogs,
+    });
+  } catch (error) {
+    const err = error as Error;
+    res.status(500).json({
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
